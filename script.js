@@ -1,8 +1,8 @@
 // ===== TYPING ANIMATION =====
 const textElement = document.querySelector(".typing-text");
 const words = [
+    "Developer { } ",
     "AI Explorer <_> ",       // Coding brackets
-    "Flutter Developer { } ", // Curly braces
     "Problem Solver // ",     // Comment slashes
     "Innovator [~] "          // Terminal vibe
 ];
