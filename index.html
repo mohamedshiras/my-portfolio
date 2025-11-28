@@ -7,7 +7,7 @@
     <title>Mohamed Shiras - Portfolio</title>
 
     <!-- Adaptive Skull Favicon -->
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="favicon.ico" type="image/x-icon">
 
     <!-- Rest of your head content... -->
@@ -300,12 +300,16 @@
                 </div>
             </div>
 
-            <form class="contact-form reveal">
-                <input type="text" placeholder="Your Name" required>
-                <input type="email" placeholder="Your Email" required>
-                <textarea placeholder="Your Message" rows="5" required></textarea>
-                <button type="submit" class="btn-download">SEND MESSAGE</button>
+            <form class="contact-form reveal" id="contactForm">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                <button class="btn-download" type="submit">Send Message</button>
+            
+                <p id="statusMsg" style="color:#00ff99; margin-top:10px;"></p>
             </form>
+
+
         </div>
     </section>
 

@@ -265,16 +265,34 @@ projectCards.forEach(card => {
     });
 });
 
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault();  // stop redirect
 
-// ===== FORM SUBMISSION HANDLER =====
-const contactForm = document.querySelector('.contact-form');
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const statusMsg = document.getElementById('statusMsg');
 
-contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+    submitBtn.textContent = 'SENDING...';
+    submitBtn.disabled = true;
 
-    // Add your form submission logic here
-    alert('Thank you for your message! I will get back to you soon.');
-    contactForm.reset();
+    try {
+        const res = await fetch("https://formspree.io/f/mqavdnwq", {
+            method: "POST",
+            body: new FormData(form),
+            headers: { "Accept": "application/json" }
+        });
+
+        if (res.ok) {
+            form.reset();
+        } else {
+            statusMsg.textContent = "Something went wrong ❌ Try again.";
+        }
+    } catch (error) {
+        statusMsg.textContent = "Network error ❌";
+    }
+
+    submitBtn.textContent = 'Send Message';
+    submitBtn.disabled = false;
 });
 
 
