@@ -81,5 +81,5 @@ If you’d like to run or modify this portfolio locally:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/<your-username>/<your-portfolio-repo>.git
-cd <your-portfolio-repo>
+git clone https://github.com/mohamedshiras/my-portfolio.git
+cd my-portofolio
