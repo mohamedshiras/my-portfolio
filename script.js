@@ -275,6 +275,14 @@
     setTimeout(() => {
         cancelAnimationFrame(animationId);
         loadingScreen.classList.add('hidden');
+
+        // Fade in main content
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            setTimeout(() => {
+                mainContent.classList.add('visible');
+            }, 100); // Small delay for smoother transition
+        }
     }, totalDuration);
 })();
 
