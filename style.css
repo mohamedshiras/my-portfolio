@@ -7,6 +7,73 @@
     scroll-behavior: smooth;
 }
 
+/* Hide scrollbar but keep scrolling */
+html {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+}
+
+html::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+}
+
+/* --- LOADING SCREEN --- */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #050005;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+
+
+#loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.gooey-filter {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.gooey-text-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: url(#threshold);
+    min-height: 120px;
+    width: 100%;
+    z-index: 1;
+}
+
+.gooey-text {
+    position: absolute;
+    font-size: 4rem;
+    font-weight: 700;
+    color: #d500f9;
+    text-align: center;
+    user-select: none;
+}
+
+@media (max-width: 768px) {
+    .gooey-text {
+        font-size: 2.5rem;
+    }
+}
+
 body {
     background-color: #050005;
     background-image: radial-gradient(circle at 80% 20%, #240046, #000000 50%);
@@ -130,10 +197,22 @@ nav.scrolled {
     z-index: 1;
 }
 
+#shader-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
 /* UPDATED: Increased width to fit longer text */
 .content {
     max-width: 700px;
     animation: fadeInLeft 1s ease;
+    position: relative;
+    z-index: 1;
 }
 
 .greeting {
@@ -229,6 +308,7 @@ h1 {
     justify-content: center;
     align-items: center;
     animation: fadeInRight 1s ease;
+    z-index: 1;
 }
 
 .avatar-container {
@@ -525,25 +605,107 @@ h1 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 40px;
+    align-items: stretch;
 }
 
 #studies .projects-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
-.project-card {
-    background: #111;
-    border-radius: 15px;
-    overflow: hidden;
-    border: 1px solid #222;
-    transition: all 0.4s ease;
-    cursor: pointer;
+/* Project card wrapper for outer static border */
+.project-card-wrapper {
+    position: relative;
+    border-radius: 1.5rem;
+    padding: 0.75rem;
+    height: 100%;
+    background: #0a0a0a;
+    --start: 0;
+    --spread: 40;
+    --active: 0;
 }
 
-.project-card:hover {
-    transform: translateY(-15px) scale(1.02);
-    border-color: #d500f9;
-    box-shadow: 0 10px 40px rgba(213, 0, 249, 0.3);
+/* Glowing border effect */
+.project-card-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    border: 3px solid transparent;
+    background:
+        radial-gradient(circle, #d500f9 10%, transparent 20%),
+        radial-gradient(circle at 40% 40%, #ffffff 5%, transparent 15%),
+        radial-gradient(circle at 60% 60%, #d500f9 10%, transparent 20%),
+        radial-gradient(circle at 40% 60%, #ffffff 10%, transparent 20%),
+        repeating-conic-gradient(from 236.84deg at 50% 50%,
+            #d500f9 0%,
+            #ffffff 5%,
+            #d500f9 10%,
+            #ffffff 15%,
+            #d500f9 20%);
+    background-attachment: fixed;
+    -webkit-mask:
+        linear-gradient(#0000, #0000),
+        conic-gradient(from calc((var(--start) - var(--spread)) * 1deg),
+            #00000000 0deg,
+            #fff calc(var(--spread) * 1deg),
+            #00000000 calc(var(--spread) * 2deg));
+    -webkit-mask-clip: padding-box, border-box;
+    -webkit-mask-composite: intersect;
+    mask:
+        linear-gradient(#0000, #0000),
+        conic-gradient(from calc((var(--start) - var(--spread)) * 1deg),
+            #00000000 0deg,
+            #fff calc(var(--spread) * 1deg),
+            #00000000 calc(var(--spread) * 2deg));
+    mask-clip: padding-box, border-box;
+    mask-composite: intersect;
+    opacity: var(--active);
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+/* Static border when not glowing */
+.project-card-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    border: 1px solid #333;
+    pointer-events: none;
+    opacity: calc(1 - var(--active));
+    transition: opacity 0.3s ease;
+}
+
+.project-card {
+    background: #0f0f0f;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 0.75px solid #222;
+    box-shadow: 0px 0px 27px 0px rgba(45, 45, 45, 0.3);
+}
+
+/* Inner card content wrapper */
+.project-card>.card-image,
+.project-card>.card-info {
+    position: relative;
+    z-index: 1;
+    background: #0f0f0f;
+}
+
+.project-card>.card-image {
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.project-card>.card-info {
+    border-radius: 0 0 0.75rem 0.75rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-image {
@@ -568,11 +730,6 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.4s ease;
-}
-
-.project-card:hover .img-placeholder {
-    transform: scale(1.1);
 }
 
 .card-info {

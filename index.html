@@ -59,6 +59,23 @@
 </head>
 
 <body>
+    <div id="loading-screen">
+        <svg class="gooey-filter" aria-hidden="true">
+            <defs>
+                <filter id="threshold">
+                    <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0
+                                0 1 0 0 0
+                                0 0 1 0 0
+                                0 0 0 255 -140" />
+                </filter>
+            </defs>
+        </svg>
+        <div class="gooey-text-container">
+            <span id="gooey-text1" class="gooey-text"></span>
+            <span id="gooey-text2" class="gooey-text"></span>
+        </div>
+    </div>
+
     <canvas id="particles-bg"></canvas>
 
     <nav id="navbar">
@@ -83,6 +100,7 @@
     </nav>
 
     <section id="home" class="hero">
+        <canvas id="shader-bg"></canvas>
         <div class="content">
             <p class="greeting">Hello, I'm Mohamed Shiras 👋</p>
             <h1><span class="typing-text"></span><span class="cursor">|</span></h1>
@@ -100,11 +118,8 @@
 
         <div class="visuals">
             <div class="avatar-container">
-                <img src="assets/imagegpt.png"
-                     alt="Mohamed Shiras - Software Engineering Undergraduate profile photo"
-                     class="avatar"
-                     loading="eager"
-                     fetchpriority="high">
+                <img src="assets/imagegpt.png" alt="Mohamed Shiras - Software Engineering Undergraduate profile photo"
+                    class="avatar" loading="eager" fetchpriority="high">
                 <div class="avatar-glow"></div>
             </div>
 
@@ -151,7 +166,8 @@
         <div class="about-container">
             <div class="about-text reveal">
                 <p>
-                    I am Mohamed Shiras, a Software Engineering undergraduate at NIBM, exploring diverse fields of technology
+                    I am Mohamed Shiras, a Software Engineering undergraduate at NIBM, exploring diverse fields of
+                    technology
                     from software development to AI solutions.
                 </p>
 
@@ -222,7 +238,8 @@
                         <span>Java</span><span>OOP</span><span>System</span>
                     </div>
                     <div class="card-links">
-                        <a href="https://github.com/mohamedshiras/ATM-Management-System" target="_blank" class="btn-sm">GitHub</a>
+                        <a href="https://github.com/mohamedshiras/ATM-Management-System" target="_blank"
+                            class="btn-sm">GitHub</a>
                     </div>
                 </div>
             </div>
@@ -238,7 +255,8 @@
                         <span>Java</span><span>Banking</span><span>Teamwork</span>
                     </div>
                     <div class="card-links">
-                        <a href="https://github.com/NimeshKolambage/Aura_Banking_Application" target="_blank" class="btn-sm">GitHub</a>
+                        <a href="https://github.com/NimeshKolambage/Aura_Banking_Application" target="_blank"
+                            class="btn-sm">GitHub</a>
                     </div>
                 </div>
             </div>
@@ -249,7 +267,8 @@
                 </div>
                 <div class="card-info">
                     <h3>Hkz Mart</h3>
-                    <p>An elegant online store for handmade gifts and trendy girls’ accessories, crafted with a focus on aesthetics,
+                    <p>An elegant online store for handmade gifts and trendy girls’ accessories, crafted with a focus on
+                        aesthetics,
                         usability, and performance.</p>
                     <div class="card-tags">
                         <span>HTML-5</span><span>Javascript</span><span>CSS</span><span>Firebase</span>
@@ -262,7 +281,8 @@
 
             <div class="project-card reveal">
                 <div class="card-image">
-                    <img src="assets/musclefactory.png" alt="Muscle Factory - Fitness Management System" class="project-img">
+                    <img src="assets/musclefactory.png" alt="Muscle Factory - Fitness Management System"
+                        class="project-img">
                 </div>
                 <div class="card-info">
                     <h3>Muscle Factory - Fitness Management System</h3>
@@ -271,7 +291,8 @@
                         <span>Firestore</span><span>JavaScript</span><span>CSS</span>
                     </div>
                     <div class="card-links">
-                        <a href="https://github.com/mohamedshiras/gym-management-system" target="_blank" class="btn-sm">GitHub</a>
+                        <a href="https://github.com/mohamedshiras/gym-management-system" target="_blank"
+                            class="btn-sm">GitHub</a>
                     </div>
                 </div>
             </div>
@@ -303,7 +324,8 @@
                         <span>HTML5</span><span>CSS</span><span>Javascript</span>
                     </div>
                     <div class="card-links">
-                        <a href="https://github.com/mohamedshiras/my-portfolio" target="_blank" class="btn-sm">GitHub</a>
+                        <a href="https://github.com/mohamedshiras/my-portfolio" target="_blank"
+                            class="btn-sm">GitHub</a>
                     </div>
                 </div>
             </div>
