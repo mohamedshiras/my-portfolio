@@ -86,22 +86,9 @@ html::-webkit-scrollbar {
 
 body {
     background-color: #050005;
-    background-image: radial-gradient(circle at 80% 20%, #240046, #000000 50%);
-    background-attachment: fixed;
     color: white;
     overflow-x: hidden;
     position: relative;
-}
-
-/* --- ANIMATED BACKGROUND CANVAS --- */
-#particles-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
 }
 
 /* --- NAVIGATION --- */
@@ -1033,7 +1020,17 @@ footer {
         text-align: center;
         justify-content: center;
         height: auto;
+        min-height: 100vh;
         padding: 100px 5% 50px;
+        overflow: hidden;
+    }
+
+    #shader-bg {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -75%);
+        width: 220%;
+        height: 90%;
     }
 
     /* UPDATED: Reset for mobile so text can wrap */
