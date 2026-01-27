@@ -42,6 +42,16 @@ html::-webkit-scrollbar {
     visibility: hidden;
 }
 
+/* --- MAIN CONTENT FADE IN --- */
+#main-content {
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+#main-content.visible {
+    opacity: 1;
+}
+
 .gooey-filter {
     position: absolute;
     width: 0;
