@@ -305,7 +305,8 @@
                     </div>
                     <div class="card-info">
                         <h3>Muscle Factory - Fitness Management System</h3>
-                        <p>A real-time gym management platform designed to streamline member registrations, subscriptions, and etc.</p>
+                        <p>A real-time gym management platform designed to streamline member registrations,
+                            subscriptions, and etc.</p>
                         <div class="card-tags">
                             <span>Firestore</span><span>JavaScript</span><span>CSS</span>
                         </div>
@@ -326,14 +327,16 @@
                     </div>
                     <div class="card-info">
                         <h3>Keylogger</h3>
-                        <p>A stealthy Python-based tool that captures keystrokes and handles backspaces locally for clean, readable
+                        <p>A stealthy Python-based tool that captures keystrokes and handles backspaces locally for
+                            clean, readable
                             logs. It
                             operates silently in the background</p>
                         <div class="card-tags">
                             <span>Python</span><span>Google Cloud Console</span><span>API</span>
                         </div>
                         <div class="card-links">
-                            <a href="https://github.com/mohamedshiras/KeyLogger/" target="_blank" class="btn-sm">GitHub</a>
+                            <a href="https://github.com/mohamedshiras/KeyLogger/" target="_blank"
+                                class="btn-sm">GitHub</a>
                         </div>
                     </div>
                 </div>
@@ -459,6 +462,33 @@
                 <a href="https://instagram.com/chiya.forsure" target="_blank"><i class="fab fa-instagram"></i></a>
             </div>
         </footer>
+
+        <!-- AI Chat Widget -->
+        <div id="chat-widget">
+            <button id="chat-toggle" aria-label="Open AI Assistant">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </button>
+
+            <div id="chat-box">
+                <div class="chat-header">
+                    <span>Chiya</span>
+                    <span id="chat-close">&times;</span>
+                </div>
+
+                <div id="chat-messages">
+                    <div class="chat-msg ai-msg">Hey! I'm Chiya, Shiras's AI assistant. Ask me anything about his
+                        projects or skills!</div>
+                </div>
+
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Ask a question..." autocomplete="off">
+                    <button id="chat-send">Send</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
