@@ -655,4 +655,226 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// ===== AI CHAT WIDGET =====
+(function () {
+    const chatToggle = document.getElementById('chat-toggle');
+    const chatClose = document.getElementById('chat-close');
+    const chatBox = document.getElementById('chat-box');
+    const chatSend = document.getElementById('chat-send');
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatRetry = document.getElementById('chat-retry');
+    const statusDot = document.querySelector('.status-dot');
+    const statusText = document.querySelector('.chat-status');
+
+    // YOUR N8N WEBHOOK URL - Replace this with your actual webhook URL
+    const WEBHOOK_URL = "https://lignocellulosic-inadmissible-ashlee.ngrok-free.dev/webhook/portfolio-ai";
+
+    let isServiceOnline = true;
+
+    // Check service health
+    async function checkServiceHealth() {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const response = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': '69420'
+                },
+                body: JSON.stringify({ message: 'ping', healthCheck: true }),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+            return response.ok || response.status < 500;
+        } catch (error) {
+            console.log('Service health check failed:', error.message);
+            return false;
+        }
+    }
+
+    // Update UI based on service status
+    function setOfflineState(offline) {
+        isServiceOnline = !offline;
+        if (offline) {
+            chatBox.classList.add('offline');
+            if (statusText) {
+                statusText.innerHTML = '<span class="status-dot"></span>Offline';
+            }
+        } else {
+            chatBox.classList.remove('offline');
+            if (statusText) {
+                statusText.innerHTML = '<span class="status-dot"></span>Online';
+            }
+        }
+    }
+
+    // Toggle chat box with health check
+    chatToggle.addEventListener('click', async () => {
+        chatBox.classList.toggle('active');
+        if (chatBox.classList.contains('active')) {
+            // Check service health when opening chat
+            const isOnline = await checkServiceHealth();
+            setOfflineState(!isOnline);
+            if (isOnline) {
+                chatInput.focus();
+            }
+        }
+    });
+
+    chatClose.addEventListener('click', () => {
+        chatBox.classList.remove('active');
+    });
+
+    // Retry connection button
+    if (chatRetry) {
+        chatRetry.addEventListener('click', async () => {
+            chatRetry.textContent = 'Checking...';
+            chatRetry.disabled = true;
+
+            const isOnline = await checkServiceHealth();
+            setOfflineState(!isOnline);
+
+            chatRetry.textContent = 'Retry Connection';
+            chatRetry.disabled = false;
+
+            if (isOnline) {
+                chatInput.focus();
+            }
+        });
+    }
+
+    let isWaitingForResponse = false;
+
+    // Send message function
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        // Prevent sending while waiting for response
+        if (isWaitingForResponse) return;
+
+        // Add user message
+        addMessage(text, 'user');
+        chatInput.value = '';
+
+        // Remove any existing typing indicators first
+        const existingTyping = chatMessages.querySelector('.typing-indicator');
+        if (existingTyping) existingTyping.remove();
+
+        // Add typing indicator
+        isWaitingForResponse = true;
+        const typingId = addMessage('Typing...', 'typing');
+
+        try {
+            const response = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': '69420'
+                },
+                body: JSON.stringify({ message: text })
+            });
+
+            // Check for server errors
+            if (response.status >= 500) {
+                removeMessage(typingId);
+                setOfflineState(true);
+                isWaitingForResponse = false;
+                return;
+            }
+
+            // Get response as text first
+            const responseText = await response.text();
+            console.log('n8n Response:', responseText);
+
+            // Remove typing indicator
+            removeMessage(typingId);
+
+            // Check if response is empty
+            if (!responseText || responseText.trim() === '') {
+                addMessage("Chiya is thinking... Please try again.", 'ai');
+                isWaitingForResponse = false;
+                return;
+            }
+
+            // Try to parse as JSON
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                // If not JSON, use the text directly
+                addMessage(responseText, 'ai');
+                isWaitingForResponse = false;
+                return;
+            }
+
+            // Handle different response formats from n8n
+            let aiResponse = data.output || data.response || data.text || data.message;
+
+            // If data is an array, get first item
+            if (Array.isArray(data) && data.length > 0) {
+                aiResponse = data[0].output || data[0].response || data[0].text || data[0].message || data[0];
+            }
+
+            // If still nothing, stringify the whole response
+            if (!aiResponse && typeof data === 'string') {
+                aiResponse = data;
+            }
+
+            addMessage(aiResponse || "I couldn't process that request.", 'ai');
+            isWaitingForResponse = false;
+
+        } catch (error) {
+            removeMessage(typingId);
+            // Check if it's a network/connection error
+            if (error.name === 'TypeError' || error.message.includes('fetch') || error.message.includes('network')) {
+                setOfflineState(true);
+            } else {
+                addMessage("Unable to reach Chiya. The service may be temporarily unavailable.", 'ai');
+            }
+            console.error('Chat error:', error);
+            isWaitingForResponse = false;
+        }
+    }
+
+    // Event listeners for sending
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // Add message to chat
+    function addMessage(text, type) {
+        const msgDiv = document.createElement('div');
+        const id = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        msgDiv.id = id;
+        msgDiv.className = 'chat-msg';
+
+        if (type === 'user') {
+            msgDiv.classList.add('user-msg');
+        } else if (type === 'typing') {
+            msgDiv.classList.add('typing-indicator');
+        } else {
+            msgDiv.classList.add('ai-msg');
+        }
+
+        msgDiv.textContent = text;
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        return id;
+    }
+
+    // Remove message by ID
+    function removeMessage(id) {
+        const msg = document.getElementById(id);
+        if (msg) msg.remove();
+    }
+})();
+
+
 console.log('Portfolio loaded successfully! ✨');
