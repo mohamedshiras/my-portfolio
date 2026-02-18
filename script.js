@@ -663,21 +663,89 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatSend = document.getElementById('chat-send');
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
+    const chatRetry = document.getElementById('chat-retry');
+    const statusDot = document.querySelector('.status-dot');
+    const statusText = document.querySelector('.chat-status');
 
     // YOUR N8N WEBHOOK URL - Replace this with your actual webhook URL
     const WEBHOOK_URL = "https://lignocellulosic-inadmissible-ashlee.ngrok-free.dev/webhook/portfolio-ai";
 
-    // Toggle chat box
-    chatToggle.addEventListener('click', () => {
+    let isServiceOnline = true;
+
+    // Check service health
+    async function checkServiceHealth() {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const response = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': '69420'
+                },
+                body: JSON.stringify({ message: 'ping', healthCheck: true }),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+            return response.ok || response.status < 500;
+        } catch (error) {
+            console.log('Service health check failed:', error.message);
+            return false;
+        }
+    }
+
+    // Update UI based on service status
+    function setOfflineState(offline) {
+        isServiceOnline = !offline;
+        if (offline) {
+            chatBox.classList.add('offline');
+            if (statusText) {
+                statusText.innerHTML = '<span class="status-dot"></span>Offline';
+            }
+        } else {
+            chatBox.classList.remove('offline');
+            if (statusText) {
+                statusText.innerHTML = '<span class="status-dot"></span>Online';
+            }
+        }
+    }
+
+    // Toggle chat box with health check
+    chatToggle.addEventListener('click', async () => {
         chatBox.classList.toggle('active');
         if (chatBox.classList.contains('active')) {
-            chatInput.focus();
+            // Check service health when opening chat
+            const isOnline = await checkServiceHealth();
+            setOfflineState(!isOnline);
+            if (isOnline) {
+                chatInput.focus();
+            }
         }
     });
 
     chatClose.addEventListener('click', () => {
         chatBox.classList.remove('active');
     });
+
+    // Retry connection button
+    if (chatRetry) {
+        chatRetry.addEventListener('click', async () => {
+            chatRetry.textContent = 'Checking...';
+            chatRetry.disabled = true;
+
+            const isOnline = await checkServiceHealth();
+            setOfflineState(!isOnline);
+
+            chatRetry.textContent = 'Retry Connection';
+            chatRetry.disabled = false;
+
+            if (isOnline) {
+                chatInput.focus();
+            }
+        });
+    }
 
     let isWaitingForResponse = false;
 
@@ -710,6 +778,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ message: text })
             });
+
+            // Check for server errors
+            if (response.status >= 500) {
+                removeMessage(typingId);
+                setOfflineState(true);
+                isWaitingForResponse = false;
+                return;
+            }
 
             // Get response as text first
             const responseText = await response.text();
@@ -754,7 +830,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             removeMessage(typingId);
-            addMessage("Error connecting to Chiya. Please try again.", 'ai');
+            // Check if it's a network/connection error
+            if (error.name === 'TypeError' || error.message.includes('fetch') || error.message.includes('network')) {
+                setOfflineState(true);
+            } else {
+                addMessage("Unable to reach Chiya. The service may be temporarily unavailable.", 'ai');
+            }
             console.error('Chat error:', error);
             isWaitingForResponse = false;
         }
