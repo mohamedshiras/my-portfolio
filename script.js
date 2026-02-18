@@ -668,15 +668,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusText = document.querySelector('.chat-status');
 
     // YOUR N8N WEBHOOK URL - Replace this with your actual webhook URL
-    const WEBHOOK_URL = "https://lignocellulosic-inadmissible-ashlee.ngrok-free.dev/webhook/portfolio-ai";
+    const WEBHOOK_URL = "https://thechiya-n8n-agent.hf.space/webhook/portfolio-ai";
 
     let isServiceOnline = true;
+    let hasCheckedHealth = false;
 
-    // Check service health
+    // Check service health - more lenient check
     async function checkServiceHealth() {
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout for cold starts
 
             const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
@@ -684,14 +685,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json',
                     'ngrok-skip-browser-warning': '69420'
                 },
-                body: JSON.stringify({ message: 'ping', healthCheck: true }),
+                body: JSON.stringify({ message: 'ping' }),
                 signal: controller.signal
             });
 
             clearTimeout(timeoutId);
-            return response.ok || response.status < 500;
+            // Any response means service is reachable (even 4xx errors)
+            return true;
         } catch (error) {
+            // Only truly offline if fetch itself fails (network error, timeout, CORS)
             console.log('Service health check failed:', error.message);
+            // Check if it's an abort (timeout) vs actual network failure
+            if (error.name === 'AbortError') {
+                return false; // Timeout - service likely down
+            }
+            // For other errors, could be CORS which means server is responding
             return false;
         }
     }
@@ -712,14 +720,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Toggle chat box with health check
+    // Toggle chat box - assume online, check only if previously failed
     chatToggle.addEventListener('click', async () => {
         chatBox.classList.toggle('active');
         if (chatBox.classList.contains('active')) {
-            // Check service health when opening chat
-            const isOnline = await checkServiceHealth();
-            setOfflineState(!isOnline);
-            if (isOnline) {
+            // Only run health check if we're currently in offline state
+            if (chatBox.classList.contains('offline')) {
+                const isOnline = await checkServiceHealth();
+                setOfflineState(!isOnline);
+            }
+            if (!chatBox.classList.contains('offline')) {
                 chatInput.focus();
             }
         }
